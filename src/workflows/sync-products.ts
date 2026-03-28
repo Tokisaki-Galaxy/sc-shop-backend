@@ -9,6 +9,10 @@ type SyncProductsWorkflowInput = {
   offset?: number
 }
 
+type QueriedProduct = SyncProductsStepInput["products"][number] & {
+  status: string
+}
+
 export const syncProductsWorkflow = createWorkflow(
   "sync-products",
   ({ filters, limit, offset }: SyncProductsWorkflowInput) => {
@@ -44,11 +48,13 @@ export const syncProductsWorkflow = createWorkflow(
       const unpublishedProductsToDelete: string[] = []
 
       data.products.forEach((product) => {
-        if (product.status === "published") {
-          const { status, ...rest } = product
-          publishedProducts.push(rest as SyncProductsStepInput["products"][0])
+        const typedProduct = product as QueriedProduct
+
+        if (typedProduct.status === "published") {
+          const { status, ...rest } = typedProduct
+          publishedProducts.push(rest)
         } else {
-          unpublishedProductsToDelete.push(product.id)
+          unpublishedProductsToDelete.push(typedProduct.id)
         }
       })
 

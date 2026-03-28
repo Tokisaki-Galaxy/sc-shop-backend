@@ -39,7 +39,7 @@ export default class MeilisearchModuleService {
     this.options = options
   }
 
-  async getIndexName(type: MeilisearchIndexType) {
+  getIndexName(type: MeilisearchIndexType) {
     switch (type) {
       case "product":
         return this.options.productIndexName
@@ -49,7 +49,7 @@ export default class MeilisearchModuleService {
   }
 
   async indexData<T extends object>(data: T[], type: MeilisearchIndexType = "product") {
-    const indexName = await this.getIndexName(type)
+    const indexName = this.getIndexName(type)
     const index = this.client.index(indexName)
 
     await index.addDocuments(data)
@@ -59,7 +59,7 @@ export default class MeilisearchModuleService {
     documentIds: string[],
     type: MeilisearchIndexType = "product"
   ): Promise<T[]> {
-    const indexName = await this.getIndexName(type)
+    const indexName = this.getIndexName(type)
     const index = this.client.index(indexName)
 
     const results = await Promise.all(
@@ -76,14 +76,14 @@ export default class MeilisearchModuleService {
   }
 
   async deleteFromIndex(documentIds: string[], type: MeilisearchIndexType = "product") {
-    const indexName = await this.getIndexName(type)
+    const indexName = this.getIndexName(type)
     const index = this.client.index(indexName)
 
     await index.deleteDocuments(documentIds)
   }
 
   async search(query: string, type: MeilisearchIndexType = "product") {
-    const indexName = await this.getIndexName(type)
+    const indexName = this.getIndexName(type)
     const index = this.client.index(indexName)
 
     return await index.search(query)

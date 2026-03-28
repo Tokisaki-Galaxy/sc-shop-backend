@@ -1,11 +1,12 @@
 import crypto from "node:crypto"
 import { SubscriberArgs, type SubscriberConfig } from "@medusajs/framework"
 import { Modules } from "@medusajs/framework/utils"
-
-const EMAIL_VERIFIED_KEY = "email_verified"
-const EMAIL_VERIFICATION_TOKEN_KEY = "email_verification_token"
-const EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY = "email_verification_token_expires_at"
-const EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MS = 1000 * 60 * 60 * 24
+import {
+  EMAIL_VERIFIED_KEY,
+  EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY,
+  EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MS,
+  EMAIL_VERIFICATION_TOKEN_KEY,
+} from "../lib/email-verification"
 
 export default async function customerCreatedHandler({
   event: { data },
@@ -16,6 +17,10 @@ export default async function customerCreatedHandler({
   const config = container.resolve("configModule")
 
   const customer = await customerModuleService.retrieveCustomer(data.id)
+  if (!customer.has_account) {
+    return
+  }
+
   const verificationToken = crypto.randomBytes(32).toString("hex")
   const expiresAt = new Date(
     Date.now() + EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MS

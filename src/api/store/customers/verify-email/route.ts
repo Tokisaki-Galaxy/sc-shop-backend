@@ -6,10 +6,11 @@ import {
   MedusaError,
   Modules,
 } from "@medusajs/framework/utils"
-
-const EMAIL_VERIFIED_KEY = "email_verified"
-const EMAIL_VERIFICATION_TOKEN_KEY = "email_verification_token"
-const EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY = "email_verification_token_expires_at"
+import {
+  EMAIL_VERIFIED_KEY,
+  EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY,
+  EMAIL_VERIFICATION_TOKEN_KEY,
+} from "../../../../lib/email-verification"
 
 type VerifyEmailBody = {
   token?: string
@@ -48,26 +49,36 @@ async function verifyCustomerEmail(
     )
   }
 
-  if (typeof expiresAt !== "string" || Number.isNaN(Date.parse(expiresAt))) {
+  if (typeof expiresAt !== "string") {
     throw new MedusaError(
       MedusaError.Types.UNAUTHORIZED,
       "邮箱验证链接无效"
     )
   }
 
-  if (Date.now() > Date.parse(expiresAt)) {
+  const expiresAtTimestamp = Date.parse(expiresAt)
+  if (Number.isNaN(expiresAtTimestamp)) {
+    throw new MedusaError(
+      MedusaError.Types.UNAUTHORIZED,
+      "邮箱验证链接无效"
+    )
+  }
+
+  if (Date.now() > expiresAtTimestamp) {
     throw new MedusaError(
       MedusaError.Types.UNAUTHORIZED,
       "邮箱验证链接已过期，请重新注册或联系支持"
     )
   }
 
+  const nextMetadata = { ...metadata }
+  delete nextMetadata[EMAIL_VERIFICATION_TOKEN_KEY]
+  delete nextMetadata[EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY]
+
   await customerModuleService.updateCustomers(customer.id, {
     metadata: {
-      ...metadata,
+      ...nextMetadata,
       [EMAIL_VERIFIED_KEY]: true,
-      [EMAIL_VERIFICATION_TOKEN_KEY]: null,
-      [EMAIL_VERIFICATION_TOKEN_EXPIRES_AT_KEY]: null,
     },
   })
 

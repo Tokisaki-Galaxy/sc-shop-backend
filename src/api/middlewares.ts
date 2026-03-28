@@ -8,8 +8,7 @@ import {
   MedusaError,
   Modules,
 } from "@medusajs/framework/utils"
-
-const EMAIL_VERIFIED_KEY = "email_verified"
+import { EMAIL_VERIFIED_KEY } from "../lib/email-verification"
 
 async function ensureCustomerEmailVerified(
   req: MedusaRequest,
@@ -31,8 +30,13 @@ async function ensureCustomerEmailVerified(
     return
   }
 
-  const isVerified = customer.metadata?.[EMAIL_VERIFIED_KEY] === true
-  if (!isVerified) {
+  const emailVerifiedMeta = customer.metadata?.[EMAIL_VERIFIED_KEY]
+  if (typeof emailVerifiedMeta !== "boolean") {
+    next()
+    return
+  }
+
+  if (emailVerifiedMeta !== true) {
     throw new MedusaError(
       MedusaError.Types.UNAUTHORIZED,
       "请先完成邮箱验证后再登录，请检查注册邮箱中的确认链接"

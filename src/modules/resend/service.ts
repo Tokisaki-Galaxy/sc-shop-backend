@@ -11,19 +11,29 @@ import { CreateEmailOptions, Resend } from "resend"
 import { orderPlacedEmail, type OrderPlacedEmailProps } from "./emails/order-placed"
 import { userInvitedEmail, type UserInvitedEmailProps } from "./emails/user-invited"
 import { passwordResetEmail, type PasswordResetEmailProps } from "./emails/password-reset"
+import {
+  customerEmailVerificationEmail,
+  type CustomerEmailVerificationEmailProps,
+} from "./emails/customer-email-verification"
 
 enum Templates {
   ORDER_PLACED = "order-placed",
   USER_INVITED = "user-invited",
   PASSWORD_RESET = "password-reset",
+  CUSTOMER_EMAIL_VERIFICATION = "customer-email-verification",
 }
 
-type TemplateProps = OrderPlacedEmailProps | UserInvitedEmailProps | PasswordResetEmailProps
+type TemplateProps =
+  | OrderPlacedEmailProps
+  | UserInvitedEmailProps
+  | PasswordResetEmailProps
+  | CustomerEmailVerificationEmailProps
 
 const templates: { [key in Templates]: (props: TemplateProps) => React.ReactNode } = {
   [Templates.ORDER_PLACED]: orderPlacedEmail,
   [Templates.USER_INVITED]: userInvitedEmail,
   [Templates.PASSWORD_RESET]: passwordResetEmail,
+  [Templates.CUSTOMER_EMAIL_VERIFICATION]: customerEmailVerificationEmail,
 }
 
 type ResendOptions = {
@@ -88,6 +98,8 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
         return "You're Invited!"
       case Templates.PASSWORD_RESET:
         return "Reset Your Password"
+      case Templates.CUSTOMER_EMAIL_VERIFICATION:
+        return "Confirm Your Email"
       default:
         return "New Email"
     }

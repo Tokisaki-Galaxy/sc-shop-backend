@@ -3,6 +3,7 @@
 .DS_Store
 /uploads
 /node_modules
+/sc-shop-frontend
 yarn-error.log
 
 .idea

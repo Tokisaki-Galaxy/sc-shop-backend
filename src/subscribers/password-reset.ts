@@ -22,7 +22,7 @@ export default async function resetPasswordTokenHandler({
   let urlPrefix = ""
 
   if (actor_type === "customer") {
-    urlPrefix = config.admin.storefrontUrl || "https://storefront.com"
+    urlPrefix = process.env.STOREFRONT_URL || "http://localhost:8000"
   } else {
     const backendUrl = config.admin.backendUrl !== "/" ? config.admin.backendUrl :
       "http://localhost:9000"

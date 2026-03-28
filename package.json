@@ -29,6 +29,7 @@
     "@medusajs/framework": "2.13.5",
     "@medusajs/medusa": "2.13.5",
     "@react-email/components": "1.0.10",
+    "meilisearch": "0.53.0",
     "resend": "^6.9.4"
   },
   "devDependencies": {

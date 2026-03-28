@@ -39,18 +39,16 @@ export default async function customerCreatedHandler({
     config.admin.storefrontUrl || process.env.STOREFRONT_URL || "http://localhost:8000"
   const verificationPath =
     process.env.STOREFRONT_EMAIL_VERIFICATION_PATH || "/verify-email"
-  const normalizedStorefrontUrl = storefrontUrl.replace(/\/$/, "")
-  const normalizedVerificationPath = verificationPath.startsWith("/")
-    ? verificationPath
-    : `/${verificationPath}`
-  const verificationUrl = `${normalizedStorefrontUrl}${normalizedVerificationPath}?token=${verificationToken}&email=${encodeURIComponent(customer.email)}`
+  const verificationUrl = new URL(verificationPath, storefrontUrl)
+  verificationUrl.searchParams.set("token", verificationToken)
+  verificationUrl.searchParams.set("email", customer.email)
 
   await notificationModuleService.createNotifications({
     to: customer.email,
     channel: "email",
     template: "customer-email-verification",
     data: {
-      verification_url: verificationUrl,
+      verification_url: verificationUrl.toString(),
       email: customer.email,
     },
   })

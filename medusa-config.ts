@@ -78,15 +78,6 @@ module.exports = defineConfig({
               callbackUrl: process.env.GOOGLE_CALLBACK_URL,
             },
           },
-          {
-            resolve: "@medusajs/medusa/auth-github",
-            id: "github",
-            options: {
-              clientId: process.env.GITHUB_CLIENT_ID,
-              clientSecret: process.env.GITHUB_CLIENT_SECRET,
-              callbackUrl: process.env.GITHUB_CALLBACK_URL,
-            },
-          },
         ],
       },
     },

@@ -9,8 +9,19 @@ type MeilisearchOptions = {
 
 export type MeilisearchIndexType = "product"
 
+type MeilisearchIndex = {
+  addDocuments: (documents: object[]) => Promise<unknown>
+  getDocument: (id: string) => Promise<Record<string, unknown>>
+  deleteDocuments: (documentIds: string[]) => Promise<unknown>
+  search: (query: string) => Promise<unknown>
+}
+
+type MeilisearchClient = {
+  index: (indexName: string) => MeilisearchIndex
+}
+
 export default class MeilisearchModuleService {
-  private client: any
+  private client: MeilisearchClient
   private options: MeilisearchOptions
 
   constructor({}, options: MeilisearchOptions) {
@@ -24,7 +35,7 @@ export default class MeilisearchModuleService {
     this.client = new Meilisearch({
       host: options.host,
       apiKey: options.apiKey,
-    })
+    }) as MeilisearchClient
     this.options = options
   }
 
@@ -37,17 +48,17 @@ export default class MeilisearchModuleService {
     }
   }
 
-  async indexData(data: Record<string, unknown>[], type: MeilisearchIndexType = "product") {
+  async indexData<T extends object>(data: T[], type: MeilisearchIndexType = "product") {
     const indexName = await this.getIndexName(type)
     const index = this.client.index(indexName)
 
     await index.addDocuments(data)
   }
 
-  async retrieveFromIndex(
+  async retrieveFromIndex<T extends Record<string, unknown> = Record<string, unknown>>(
     documentIds: string[],
     type: MeilisearchIndexType = "product"
-  ): Promise<Record<string, unknown>[]> {
+  ): Promise<T[]> {
     const indexName = await this.getIndexName(type)
     const index = this.client.index(indexName)
 
@@ -61,7 +72,7 @@ export default class MeilisearchModuleService {
       })
     )
 
-    return results.filter((result): result is Record<string, unknown> => Boolean(result))
+    return results.filter((result): result is T => Boolean(result))
   }
 
   async deleteFromIndex(documentIds: string[], type: MeilisearchIndexType = "product") {

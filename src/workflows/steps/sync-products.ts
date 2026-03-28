@@ -21,6 +21,8 @@ export type SyncProductsStepInput = {
   }[]
 }
 
+type MeilisearchProductDocument = SyncProductsStepInput["products"][number]
+
 export const syncProductsStep = createStep(
   "sync-products",
   async ({ products }: SyncProductsStepInput, { container }) => {
@@ -28,7 +30,7 @@ export const syncProductsStep = createStep(
       MEILISEARCH_MODULE
     )
 
-    const existingProducts = await meilisearchModuleService.retrieveFromIndex(
+    const existingProducts = await meilisearchModuleService.retrieveFromIndex<MeilisearchProductDocument>(
       products.map((product) => product.id),
       "product"
     )
@@ -37,7 +39,7 @@ export const syncProductsStep = createStep(
     ))
 
     await meilisearchModuleService.indexData(
-      products as unknown as Record<string, unknown>[],
+      products,
       "product"
     )
 

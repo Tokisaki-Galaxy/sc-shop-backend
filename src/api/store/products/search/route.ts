@@ -4,7 +4,7 @@ import { MEILISEARCH_MODULE } from "../../../../modules/meilisearch"
 import MeilisearchModuleService from "../../../../modules/meilisearch/service"
 
 export const SearchSchema = z.object({
-  query: z.string(),
+  query: z.string().trim().min(1),
 })
 
 type SearchRequest = z.infer<typeof SearchSchema>

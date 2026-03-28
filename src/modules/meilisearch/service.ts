@@ -1,5 +1,5 @@
 import { MedusaError } from "@medusajs/framework/utils"
-import { Meilisearch } from "meilisearch"
+const { Meilisearch } = require("meilisearch")
 
 type MeilisearchOptions = {
   host: string
@@ -10,7 +10,7 @@ type MeilisearchOptions = {
 export type MeilisearchIndexType = "product"
 
 export default class MeilisearchModuleService {
-  private client: Meilisearch
+  private client: any
   private options: MeilisearchOptions
 
   constructor({}, options: MeilisearchOptions) {
@@ -44,7 +44,10 @@ export default class MeilisearchModuleService {
     await index.addDocuments(data)
   }
 
-  async retrieveFromIndex(documentIds: string[], type: MeilisearchIndexType = "product") {
+  async retrieveFromIndex(
+    documentIds: string[],
+    type: MeilisearchIndexType = "product"
+  ): Promise<Record<string, unknown>[]> {
     const indexName = await this.getIndexName(type)
     const index = this.client.index(indexName)
 
@@ -58,7 +61,7 @@ export default class MeilisearchModuleService {
       })
     )
 
-    return results.filter(Boolean)
+    return results.filter((result): result is Record<string, unknown> => Boolean(result))
   }
 
   async deleteFromIndex(documentIds: string[], type: MeilisearchIndexType = "product") {

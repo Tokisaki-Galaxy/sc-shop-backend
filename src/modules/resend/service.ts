@@ -8,9 +8,9 @@ import {
   Logger,
 } from "@medusajs/framework/types"
 import { CreateEmailOptions, Resend } from "resend"
-import { orderPlacedEmail } from "./emails/order-placed"
-import { userInvitedEmail } from "./emails/user-invited"
-import { passwordResetEmail } from "./emails/password-reset"
+import { orderPlacedEmail, type OrderPlacedEmailProps } from "./emails/order-placed"
+import { userInvitedEmail, type UserInvitedEmailProps } from "./emails/user-invited"
+import { passwordResetEmail, type PasswordResetEmailProps } from "./emails/password-reset"
 
 enum Templates {
   ORDER_PLACED = "order-placed",
@@ -18,7 +18,9 @@ enum Templates {
   PASSWORD_RESET = "password-reset",
 }
 
-const templates: { [key in Templates]?: (props: unknown) => React.ReactNode } = {
+type TemplateProps = OrderPlacedEmailProps | UserInvitedEmailProps | PasswordResetEmailProps
+
+const templates: { [key in Templates]: (props: TemplateProps) => React.ReactNode } = {
   [Templates.ORDER_PLACED]: orderPlacedEmail,
   [Templates.USER_INVITED]: userInvitedEmail,
   [Templates.PASSWORD_RESET]: passwordResetEmail,
@@ -72,12 +74,6 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     if (this.options.html_templates?.[template]) {
       return this.options.html_templates[template].content
     }
-    const allowedTemplates = Object.keys(templates)
-
-    if (!allowedTemplates.includes(template)) {
-      return null
-    }
-
     return templates[template]
   }
 
@@ -122,7 +118,7 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     } else {
       emailOptions = {
         ...commonOptions,
-        react: template(notification.data),
+        react: template((notification.data ?? {}) as TemplateProps),
       }
     }
 

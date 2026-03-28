@@ -12,7 +12,7 @@ import {
   Button,
 } from "@react-email/components"
 
-type UserInvitedEmailProps = {
+export type UserInvitedEmailProps = {
   invite_url: string
   email?: string
 }

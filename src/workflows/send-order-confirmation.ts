@@ -16,7 +16,6 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
         "display_id",
         "email",
         "currency_code",
-        "total",
         "items.*",
         "shipping_address.*",
         "billing_address.*",
@@ -39,7 +38,7 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
       },
     })
 
-    const notification = when({ orders }, (data) => !!data.orders[0].email)
+    const notification = when({ orders }, (data) => !!data.orders.length && !!data.orders[0].email)
       .then(() => {
         return sendNotificationStep([{
           to: orders[0].email!,

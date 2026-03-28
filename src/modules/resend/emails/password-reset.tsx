@@ -12,7 +12,7 @@ import {
   Button,
 } from "@react-email/components"
 
-type PasswordResetEmailProps = {
+export type PasswordResetEmailProps = {
   reset_url: string
   email?: string
 }

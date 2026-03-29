@@ -24,6 +24,18 @@ module.exports = defineConfig({
         productIndexName: process.env.MEILISEARCH_PRODUCT_INDEX_NAME!,
       },
     },
+    [Modules.EVENT_BUS]: {
+      resolve: "@medusajs/medusa/event-bus-redis",
+      options: {
+        redisUrl: process.env.REDIS_URL,
+      },
+    },
+    [Modules.CACHE]: {
+      resolve: "@medusajs/medusa/cache-redis",
+      options: {
+        redisUrl: process.env.REDIS_URL,
+      },
+    },
     [Modules.FILE]: {
       resolve: "@medusajs/file",
       options: {

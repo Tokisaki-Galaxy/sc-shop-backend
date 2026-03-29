@@ -24,6 +24,29 @@ module.exports = defineConfig({
         productIndexName: process.env.MEILISEARCH_PRODUCT_INDEX_NAME!,
       },
     },
+    [Modules.LOCKING]: {
+      resolve: "@medusajs/medusa/locking",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/locking-redis",
+            id: "locking-redis",
+            is_default: true,
+            options: {
+              redisUrl: process.env.REDIS_URL,
+            },
+          },
+        ],
+      },
+    },
+    [Modules.WORKFLOW_ENGINE]: {
+      resolve: "@medusajs/medusa/workflow-engine-redis",
+      options: {
+        redis: {
+          redisUrl: process.env.REDIS_URL,
+        }
+      },
+    },
     [Modules.EVENT_BUS]: {
       resolve: "@medusajs/medusa/event-bus-redis",
       options: {

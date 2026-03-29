@@ -60,11 +60,11 @@ module.exports = defineConfig({
       },
     },
     [Modules.FILE]: {
-      resolve: "@medusajs/file",
+      resolve: "@medusajs/medusa/file",
       options: {
         providers: [
           {
-            resolve: "@medusajs/file-s3",
+            resolve: "@medusajs/medusa/file-s3",
             id: "s3",
             options: {
               file_url: process.env.FILE_S3_URL,
@@ -73,7 +73,9 @@ module.exports = defineConfig({
               region: process.env.FILE_S3_REGION || "auto",
               bucket: process.env.FILE_S3_BUCKET,
               endpoint: process.env.FILE_S3_ENDPOINT,
-              forcePathStyle: true,
+              additional_client_config: {
+                forcePathStyle: true,
+              },
             },
           },
         ],

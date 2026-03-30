@@ -16,6 +16,7 @@ export interface TurnstileVerifyResult {
   errorCodes?: string[]
   challengeTimestamp?: string
   hostname?: string
+  status?: number
 }
 
 /**
@@ -81,9 +82,14 @@ export async function verifyTurnstileToken(
       errorCodes: result["error-codes"],
       challengeTimestamp: result.challenge_ts,
       hostname: result.hostname,
+      status: response.status,
     }
   } catch (error) {
-    console.error("Turnstile verification error:", error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error("[turnstile] verification request failed", {
+      error: errorMessage,
+      hasRemoteIp: Boolean(remoteIp),
+    })
     return {
       success: false,
       errorCodes: ["internal-error"],

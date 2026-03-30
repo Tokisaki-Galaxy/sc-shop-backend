@@ -52,8 +52,17 @@ async function verifyTurnstile(
   _res: MedusaResponse,
   next: MedusaNextFunction
 ) {
+  const logger = req.scope.resolve("logger")
+  const requestPath = req.originalUrl || req.url
+
   // Skip if Turnstile is not configured
   if (!isTurnstileConfigured()) {
+    logger.warn(
+      `[turnstile] skipped because TURNSTILE_SECRET_KEY is not configured ${JSON.stringify({
+        path: requestPath,
+        method: req.method,
+      })}`
+    )
     next()
     return
   }
@@ -62,6 +71,12 @@ async function verifyTurnstile(
   const turnstileToken = body?.turnstile_token
 
   if (!turnstileToken) {
+    logger.warn(
+      `[turnstile] missing token in request body ${JSON.stringify({
+        path: requestPath,
+        method: req.method,
+      })}`
+    )
     throw new MedusaError(
       MedusaError.Types.INVALID_DATA,
       "验证码验证失败，请刷新页面重试"
@@ -78,6 +93,17 @@ async function verifyTurnstile(
   const result = await verifyTurnstileToken(turnstileToken, clientIp)
 
   if (!result.success) {
+    logger.warn(
+      `[turnstile] verification failed ${JSON.stringify({
+        path: requestPath,
+        method: req.method,
+        clientIp,
+        errorCodes: result.errorCodes,
+        hostname: result.hostname,
+        challengeTimestamp: result.challengeTimestamp,
+        status: result.status,
+      })}`
+    )
     throw new MedusaError(
       MedusaError.Types.INVALID_DATA,
       "验证码验证失败，请刷新页面重试"
